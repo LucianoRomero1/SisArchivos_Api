@@ -1,0 +1,9 @@
+login:
+  path: /login
+  defaults: { _controller: "AppBundle:Security:login" }
+  methods: POST
+
+new:
+  path: /new
+  defaults: { _controller: "AppBundle:Security:new" }
+  methods: POST
