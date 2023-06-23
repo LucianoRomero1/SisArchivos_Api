@@ -44,26 +44,4 @@ class SecurityController extends BaseController
 
         return $this->serializer($data);
     }
-
-    //Esto es de prueba
-    public function newAction(Request $request, $id = null){
-        $token      = $request->get('authorization', null);
-        $authCheck  = $this->loginHandler->validateToken($token);
-
-        if($authCheck){
-            $data   = array(
-                'status' => 'success',
-                'code'   => 200,
-                'msg'    => 'Valid'
-            );
-        }else{
-            $data       = array(
-                'status' => 'error',
-                'code'   => 400,
-                'msg'    => 'Authorization not valid'
-            );
-        }
-
-        return $this->serializer($data);
-    }
 }

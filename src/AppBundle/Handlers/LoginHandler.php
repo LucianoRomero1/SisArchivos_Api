@@ -23,9 +23,8 @@ class LoginHandler extends BaseController {
         try {
             $conn = oci_connect($username, $password, $db, 'UTF8');
             if($conn == true){
-                $user = $entityManager->getRepository(User::class)->findOneBy(["username" => $username]);
                 $token = array(
-                    'user' => $user,
+                    'user' => $username,
                     'iat' => time(),
                     //Caduca una vez a la semana
                     'exp' => time() + (7 * 24 * 60 * 60)
@@ -33,6 +32,7 @@ class LoginHandler extends BaseController {
     
                 $jwt    = JWT::encode($token, $this->key, "HS256");
                 $data = $jwt;
+
                 // //Si quiero la información decodificada se hace asi
                 // $decoded    = JWT::decode($jwt, $this->key, array("HS256"));
                 // $data       = $decoded;
@@ -57,7 +57,7 @@ class LoginHandler extends BaseController {
         $token      = isset($data['authorization']) ? $data['authorization'] : null;
         $authCheck  = $this->validateToken($token);
         if (!$authCheck) {
-            throw new \Exception('Authorization not valid');
+            throw new \Exception('Invalid Token');
         }
 
         return $authCheck;
@@ -84,7 +84,8 @@ class LoginHandler extends BaseController {
             return $auth;
         }else{
             //Devuelve los datos del user logueado
-            return $decoded;
+            $data = json_decode(json_encode($decoded), true);
+            return $data;
         }
     }
 }

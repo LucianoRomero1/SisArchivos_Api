@@ -6,10 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 use AppBundle\Handlers\LoginHandler;
+use Symfony\Component\HttpFoundation\Response;
 
 class BaseController extends AbstractController {
 
@@ -49,17 +50,18 @@ class BaseController extends AbstractController {
         return $response;
     }
 
-    public function serializer($entity){
-        $encoder = new JsonEncoder();
-        $normalizer = new ObjectNormalizer();
+    public function serializer($data){
+        $normalizers    = array(new GetSetMethodNormalizer());
+        $encoders       = array("json"=> new JsonEncoder());
         
-        $normalizer->setCircularReferenceHandler(function ($object) {
-            return $object->getName();
-        });
-        
-        $serializer = new Serializer([$normalizer], [$encoder]);
+        $serializer     = new Serializer($normalizers, $encoders);
+        $json           = $serializer->serialize($data, "json");
 
-        return json_decode($serializer->serialize($entity, 'json'));
+        $response       = new Response();
+        $response->setContent($json);
+        $response->headers->set("Content-Type", "application/json");
+
+        return $response;
     }
 
     public function messageByAction($action){
