@@ -65,7 +65,7 @@ class JwtAuth {
         $auth = false;
 
         try {
-            $decoded= JWT::decode($jwt, $this->jwtSecretKey, array("HS256"));
+            $decoded= JWT::decode($jwt, $this->key, array("HS256"));
         } catch (\Throwable $th) {
             $auth = false;
         }
