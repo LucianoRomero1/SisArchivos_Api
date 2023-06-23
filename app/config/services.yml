@@ -33,18 +33,7 @@ services:
         class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
         tags:
             - { name: doctrine.event_listener, event: postConnect }
-
-    AppBundle\Services\Helpers:
-        public: true
-        arguments: 
-            $manager: "@doctrine.orm.entity_manager"
-
-    AppBundle\Services\JwtAuth:
-        public: true
-        arguments:
-            $manager: "@doctrine.orm.entity_manager"
-            $container: '@service_container'
-
+            
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:

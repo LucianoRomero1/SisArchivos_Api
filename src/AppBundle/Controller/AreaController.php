@@ -4,29 +4,29 @@ namespace AppBundle\Controller;
 
 use AppBundle\Base\BaseController;
 use Symfony\Component\HttpFoundation\Request;
-use Knp\Component\Pager\PaginatorInterface;
 
 use AppBundle\Entity\Area;
 use AppBundle\Handlers\AreaHandler;
+use AppBundle\Handlers\LoginHandler;
 
 class AreaController extends BaseController{
 
     private $areaHandler;
+    private $loginHandler;
 
-    public function __construct(AreaHandler $areaHandler){
-        $this->areaHandler    = $areaHandler;
+    public function __construct(AreaHandler $areaHandler, LoginHandler $loginHandler){
+        $this->areaHandler = $areaHandler; 
+        $this->loginHandler = $loginHandler; 
     }
-
+    
     public function createAction(Request $request){
         try {
-            $params = $this->validateRequest($request);
-            dump($params);
-            die;
-            $data = $request->request->all();
-            $area = $this->areaHandler->setArea($data);
+            $data = json_decode($request->getContent(), true);
+            if($this->loginHandler->validateAuthorization($data)){
+                $area = $this->areaHandler->setArea($data["params"]);
+            }  
         } catch (\Exception $e) {
-            $response = $this->errorResponse($e->getMessage());
-            return $response;
+            return $this->errorResponse($e->getMessage());
         }
 
         return $this->successResponse($area, 'create');

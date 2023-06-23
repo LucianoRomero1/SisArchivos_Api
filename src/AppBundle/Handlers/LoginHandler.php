@@ -1,28 +1,19 @@
 <?php
 
-namespace AppBundle\Services;
+namespace AppBundle\Handlers;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use AppBundle\Base\BaseController;
 use Firebase\JWT\JWT;
 
 use AppBundle\Entity\User;
 
-class JwtAuth {
+class LoginHandler extends BaseController {
     
-    private $manager;
-    private $key;
-    private $container;
-
-    public function __construct($manager, ContainerInterface $container)
-    {
-        $this->manager = $manager;
-        $this->key = 'b4ss022.3b+';
-        $this->container = $container;
-    }
-
     public function signup($username, $password, $getHash = null){
+        $entityManager = $this->getEm();
+
         //Busco que DB estoy actualmente
-        $paramValue = $this->container->getParameter('database_host');
+        $paramValue = $this->getDoctrine()->getConnection()->getHost();
 
         //Seteo el string de la config de la DB
         $db = '(DESCRIPTION=( ADDRESS_LIST= (ADDRESS= (PROTOCOL=TCP)'
@@ -32,7 +23,7 @@ class JwtAuth {
         try {
             $conn = oci_connect($username, $password, $db, 'UTF8');
             if($conn == true){
-                $user = $this->manager->getRepository(User::class)->findOneBy(["username" => $username]);
+                $user = $entityManager->getRepository(User::class)->findOneBy(["username" => $username]);
                 $token = array(
                     'user' => $user,
                     'iat' => time(),
@@ -59,6 +50,17 @@ class JwtAuth {
         }
         
         return $data;
+    }
+
+    public function validateAuthorization($data)
+    {           
+        $token      = isset($data['authorization']) ? $data['authorization'] : null;
+        $authCheck  = $this->validateToken($token);
+        if (!$authCheck) {
+            throw new \Exception('Authorization not valid');
+        }
+
+        return $authCheck;
     }
 
     public function validateToken($jwt, $getIdentity = false){

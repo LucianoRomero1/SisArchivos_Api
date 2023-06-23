@@ -18,7 +18,7 @@ class AreaHandler extends BaseController
     }
 
     public function setArea($data, $area = null){
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->getEm();
 
         if(is_null($area)){
             $area = new Area();

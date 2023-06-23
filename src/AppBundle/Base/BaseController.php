@@ -2,44 +2,27 @@
 
 namespace AppBundle\Base;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class BaseController extends Controller {
-    private $validator;
-    private $jwtAuth;
+use AppBundle\Handlers\LoginHandler;
 
-    public function __construct(ValidatorInterface $validator, JwtAuth $jwtAuth){
+class BaseController extends AbstractController {
+
+    protected $key;
+    private $validator; 
+
+    public function __construct(ValidatorInterface $validator){
+        $this->key = 'b4ss022.3b+';
         $this->validator = $validator;
-        $this->jwtAuth = $jwtAuth;
     }
 
-    public function validateRequest(Request $request)
-    {           
-        $token      = $request->get('authorization', null);
-        $authCheck  = $this->jwtAuth->validateToken($token);
-
-        dump($token);
-        die;
-
-        if (!$authCheck) {
-            $response = $this->errorResponse('Unauthorized');
-            // throw new \Exception($response->getContent());
-        }
-
-        $json = $request->get('json', null);
-
-        if ($json === null) {
-            $response = $this->errorResponse('JSON data is missing');
-            // throw new \Exception($response->getContent());
-        }
-
-        return json_decode($json);
+    public function getEm(){
+        return $this->getDoctrine()->getManager();
     }
 
     public function errorResponse($message = null){
@@ -131,5 +114,11 @@ class BaseController extends Controller {
         );
 
         return $data;
+    }
+
+    public function getActualDate(){
+        $fechaActual=  new \DateTime(null, new \DateTimeZone('America/Argentina/Buenos_Aires'));
+                
+        return $fechaActual;
     }
 }

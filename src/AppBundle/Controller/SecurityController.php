@@ -2,17 +2,20 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Base\BaseController;
+use AppBundle\Handlers\LoginHandler;
 use Symfony\Component\HttpFoundation\Request;
 
-use AppBundle\Services\Helpers;
-use AppBundle\Services\JwtAuth;
-
-class SecurityController extends Controller
+class SecurityController extends BaseController
 {
+    private $loginHandler;
+    
+    public function __construct(LoginHandler $loginHandler)
+    {
+        $this->loginHandler = $loginHandler;
+    }
+
     public function loginAction(Request $request){
-        $helpers = $this->get(Helpers::class);
         $json = $request->get('json', null);
 
         $data = array(
@@ -28,9 +31,7 @@ class SecurityController extends Controller
 
             if($username != null && $password != null){
 
-                $jwt_auth = $this->get(JwtAuth::class);
-
-                $signup = $jwt_auth->signup($username, $password);
+                $signup = $this->loginHandler->signup($username, $password);
 
                 return $this->json($signup);
             }else{
@@ -41,16 +42,13 @@ class SecurityController extends Controller
             }
         }
 
-        return $helpers->json($data);
+        return $this->serializer($data);
     }
 
-    //TODO: Esto es de prueba
+    //Esto es de prueba
     public function newAction(Request $request, $id = null){
-        $helpers    = $this->get(Helpers::class);
-        $jwt_auth   = $this->get(JwtAuth::class); 
-
         $token      = $request->get('authorization', null);
-        $authCheck  = $jwt_auth->validateToken($token);
+        $authCheck  = $this->loginHandler->validateToken($token);
 
         if($authCheck){
             $data   = array(
@@ -66,6 +64,6 @@ class SecurityController extends Controller
             );
         }
 
-        return $helpers->json($data);
+        return $this->serializer($data);
     }
 }
