@@ -43,7 +43,6 @@ services:
         public: true
         arguments:
             $manager: "@doctrine.orm.entity_manager"
-            $jwtSecretKey: "%jwt_secret_key%"
             $container: '@service_container'
 
 

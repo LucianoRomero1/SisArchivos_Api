@@ -1,0 +1,19 @@
+folder_create:
+  path: /create
+  defaults: { _controller: "AppBundle:Folder:create" }
+  methods: POST
+
+folder_view:
+  path: /view
+  defaults: { _controller: "AppBundle:Folder:view" }
+  methods: GET
+
+folder_edit:
+  path: /edit/{id}
+  defaults: { _controller: "AppBundle:Folder:edit", id:null }
+  methods: POST
+
+folder_delete:
+  path: /delete/{id}
+  defaults: { _controller: "AppBundle:Folder:delete", id:null }
+  methods: DELETE

@@ -10,18 +10,18 @@ use AppBundle\Entity\User;
 class JwtAuth {
     
     private $manager;
-    private $jwtSecretKey;
+    private $key;
     private $container;
 
-    public function __construct($manager, $jwtSecretKey,ContainerInterface $container)
+    public function __construct($manager, ContainerInterface $container)
     {
         $this->manager = $manager;
-        $this->jwtSecretKey = $jwtSecretKey;
+        $this->key = 'b4ss022.3b+';
         $this->container = $container;
     }
 
     public function signup($username, $password, $getHash = null){
-        //TODO: Busco que DB estoy actualmente
+        //Busco que DB estoy actualmente
         $paramValue = $this->container->getParameter('database_host');
 
         //Seteo el string de la config de la DB
@@ -40,10 +40,10 @@ class JwtAuth {
                     'exp' => time() + (7 * 24 * 60 * 60)
                 );
     
-                $jwt    = JWT::encode($token, $this->jwtSecretKey, "HS256");
+                $jwt    = JWT::encode($token, $this->key, "HS256");
                 $data = $jwt;
                 // //Si quiero la información decodificada se hace asi
-                // $decoded    = JWT::decode($jwt, $this->jwtSecretKey, array("HS256"));
+                // $decoded    = JWT::decode($jwt, $this->key, array("HS256"));
                 // $data       = $decoded;
             }else{
                 $data = array(

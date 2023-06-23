@@ -1,0 +1,19 @@
+area_create:
+  path: /create
+  defaults: { _controller: "AppBundle:Area:create" }
+  methods: POST
+
+area_view:
+  path: /view
+  defaults: { _controller: "AppBundle:Area:view" }
+  methods: GET
+
+area_edit:
+  path: /edit/{id}
+  defaults: { _controller: "AppBundle:Area:edit", id:null }
+  methods: POST
+
+area_delete:
+  path: /delete/{id}
+  defaults: { _controller: "AppBundle:Area:delete", id:null }
+  methods: DELETE

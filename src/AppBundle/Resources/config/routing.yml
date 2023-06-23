@@ -6,4 +6,29 @@ app_security:
     resource: "@AppBundle/Resources/config/routing/security.yml"
     prefix: /security
 
+app_area:
+    resource: "@AppBundle/Resources/config/routing/area.yml"
+    prefix: /area
+
+app_box:
+    resource: "@AppBundle/Resources/config/routing/box.yml"
+    prefix: /box
+
+app_employee:
+    resource: "@AppBundle/Resources/config/routing/employee.yml"
+    prefix: /employee
+
+app_folder:
+    resource: "@AppBundle/Resources/config/routing/folder.yml"
+    prefix: /folder
+
+app_record:
+    resource: "@AppBundle/Resources/config/routing/record.yml"
+    prefix: /record
+
+app_side:
+    resource: "@AppBundle/Resources/config/routing/side.yml"
+    prefix: /side
+
+
 

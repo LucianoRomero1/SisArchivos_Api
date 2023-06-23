@@ -1,0 +1,19 @@
+box_create:
+  path: /create
+  defaults: { _controller: "AppBundle:Box:create" }
+  methods: POST
+
+box_view:
+  path: /view
+  defaults: { _controller: "AppBundle:Box:view" }
+  methods: GET
+
+box_edit:
+  path: /edit/{id}
+  defaults: { _controller: "AppBundle:Box:edit", id:null }
+  methods: POST
+
+box_delete:
+  path: /delete/{id}
+  defaults: { _controller: "AppBundle:Box:delete", id:null }
+  methods: DELETE
