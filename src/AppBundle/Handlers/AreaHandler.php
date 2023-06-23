@@ -2,19 +2,12 @@
 
 namespace AppBundle\Handlers;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Base\BaseController;
 use AppBundle\Entity\Area;
-use AppBundle\Handlers\DefaultHandler;
 use Exception;
 
-class AreaHandler extends Controller
+class AreaHandler extends BaseController
 {
-    private $defaultHandler;
-
-    public function __construct(DefaultHandler $defaultHandler){
-        $this->defaultHandler = $defaultHandler;
-    }
-
     public function findArea($em, $id){
         $area = $em->getRepository(Area::class)->findOneBy(["id"=>$id]);
         if(is_null($area)){
@@ -32,7 +25,7 @@ class AreaHandler extends Controller
         }
         $area->setName($data["name"]);
 
-        $this->defaultHandler->validateErrors($area);
+        $this->validateErrors($area);
 
         $entityManager->persist($area);
         $entityManager->flush();

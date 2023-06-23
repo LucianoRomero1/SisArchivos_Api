@@ -2,19 +2,13 @@
 
 namespace AppBundle\Handlers;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Base\BaseController;
 use AppBundle\Entity\Area;
 use AppBundle\Entity\Box;
 use Exception;
 
-class BoxHandler extends Controller
+class BoxHandler extends BaseController
 {
-    private $defaultHandler;
-
-    public function __construct(DefaultHandler $defaultHandler){
-        $this->defaultHandler = $defaultHandler;
-    }
-    
     public function findBox($em, $id){
         $box = $em->getRepository(Box::class)->findOneBy(["id"=>$id]);
         if(is_null($box)){
@@ -61,7 +55,7 @@ class BoxHandler extends Controller
         $box->setArchivedUntil(new \DateTime($data["archivedUntil"]));
         $box->setIdArea($area);
 
-        $this->defaultHandler->validateErrors($box);
+        $this->validateErrors($box);
 
         $entityManager->persist($box);
         $entityManager->flush();

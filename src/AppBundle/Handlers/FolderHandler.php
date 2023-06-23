@@ -2,18 +2,12 @@
 
 namespace AppBundle\Handlers;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Base\BaseController;
 use AppBundle\Entity\Box;
 use AppBundle\Entity\Folder;
 use Exception;
 
-class FolderHandler extends Controller{
-
-    private $defaultHandler;
-
-    public function __construct(DefaultHandler $defaultHandler){
-        $this->defaultHandler = $defaultHandler;
-    }
+class FolderHandler extends BaseController{
 
     public function findFolder($em, $id){
         $folder = $em->getRepository(Folder::class)->findOneBy(["id"=>$id]);
@@ -43,7 +37,7 @@ class FolderHandler extends Controller{
         $folder->setDateTo(new \DateTime($data['dateTo']));
         $folder->setStateNumber($data['stateNumber']);
 
-        $this->defaultHandler->validateErrors($folder);
+        $this->validateErrors($folder);
 
         $entityManager->persist($folder);
         $entityManager->flush();

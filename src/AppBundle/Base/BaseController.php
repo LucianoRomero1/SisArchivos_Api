@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Handlers;
+namespace AppBundle\Base;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,10 +10,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-use AppBundle\Services\JwtAuth;
-
-class DefaultHandler extends Controller{
-    
+class BaseController extends Controller {
     private $validator;
     private $jwtAuth;
 

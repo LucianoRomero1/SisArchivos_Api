@@ -8,12 +8,6 @@ use Exception;
 
 class RecordHandler extends Controller
 {
-    private $defaultHandler;
-
-    public function __construct(DefaultHandler $defaultHandler){
-        $this->defaultHandler = $defaultHandler;
-    }
-
     //TODO: Este handler lo dejo porque despues las acciones de retiro y devolver provienen de acá
     
     public function findRecord($em, $id){
@@ -34,7 +28,7 @@ class RecordHandler extends Controller
         
         //Acá van los setters
 
-        $this->defaultHandler->validateErrors($record);
+        $this->validateErrors($record);
 
         $entityManager->persist($record);
         $entityManager->flush();

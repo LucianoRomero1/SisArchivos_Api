@@ -2,37 +2,34 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Base\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
 
 use AppBundle\Entity\Area;
 use AppBundle\Handlers\AreaHandler;
-use AppBundle\Handlers\DefaultHandler;
 
-class AreaController extends Controller{
+class AreaController extends BaseController{
 
     private $areaHandler;
-    private $defaultHandler;
 
-    public function __construct(AreaHandler $areaHandler, DefaultHandler $defaultHandler){
+    public function __construct(AreaHandler $areaHandler){
         $this->areaHandler    = $areaHandler;
-        $this->defaultHandler = $defaultHandler;
     }
 
     public function createAction(Request $request){
         try {
-            $params = $this->defaultHandler->validateRequest($request);
+            $params = $this->validateRequest($request);
             dump($params);
             die;
             $data = $request->request->all();
             $area = $this->areaHandler->setArea($data);
         } catch (\Exception $e) {
-            $response = $this->defaultHandler->errorResponse($e->getMessage());
+            $response = $this->errorResponse($e->getMessage());
             return $response;
         }
 
-        return $this->defaultHandler->successResponse($area, 'create');
+        return $this->successResponse($area, 'create');
     }
 
     // public function viewAction(PaginatorInterface $paginator, Request $request){
