@@ -4,13 +4,11 @@ namespace AppBundle\Base;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
-
-use AppBundle\Handlers\LoginHandler;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BaseController extends AbstractController {
 
@@ -44,7 +42,7 @@ class BaseController extends AbstractController {
             "status"    => 'success',
             "code"      => 200,
             "message"   => $message,
-            "data"      => $this->serializer($data)
+            "data"      => json_decode($this->serializer($data)->getContent(), true)
         ]);
 
         return $response;

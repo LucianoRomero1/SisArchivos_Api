@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 use AppBundle\Base\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 
-use AppBundle\Entity\Area;
 use AppBundle\Handlers\AreaHandler;
 use AppBundle\Handlers\LoginHandler;
 
@@ -21,15 +20,21 @@ class AreaController extends BaseController{
     
     public function createAction(Request $request){
         try {
-            $data = json_decode($request->getContent(), true);
-            if($this->loginHandler->validateAuthorization($data)){
-                $area = $this->areaHandler->setArea($data["params"]);
+            $authorizationHeader = $request->headers->get('Authorization');
+            if($this->loginHandler->validateAuthorization($authorizationHeader)){
+                $data = json_decode($request->getContent(), true);
+                if(empty($data)){
+                    throw new \Exception("Parámetros inválidos");
+                }
+                
+                $area = $this->areaHandler->setArea($data);
             }  
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
 
-        return $this->successResponse($area, 'create');
+        // return $this->serializer($this->successResponse($area, 'create'));
+        return$this->successResponse($area, 'create');
     }
 
     // public function viewAction(PaginatorInterface $paginator, Request $request){

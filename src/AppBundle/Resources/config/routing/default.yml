@@ -3,3 +3,8 @@ homepage:
   path: /
   defaults: { _controller: "AppBundle:Default:index" }
   methods: GET
+
+login:
+  path: /login
+  defaults: { _controller: "AppBundle:Default:login" }
+  methods: POST

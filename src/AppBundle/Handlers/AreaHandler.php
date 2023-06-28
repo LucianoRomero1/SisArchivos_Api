@@ -23,11 +23,12 @@ class AreaHandler extends BaseController
         if(is_null($area)){
             $area = new Area();
         }
+            
         $area->setName($data["name"]);
 
         $this->validateErrors($area);
 
-        $entityManager->persist($area);
+        $entityManager->persist($area); 
         $entityManager->flush();
 
         return $area;       

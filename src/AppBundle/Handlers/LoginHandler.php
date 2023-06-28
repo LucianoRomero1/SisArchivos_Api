@@ -7,54 +7,51 @@ use Firebase\JWT\JWT;
 
 use AppBundle\Entity\User;
 
-class LoginHandler extends BaseController {
-    
-    public function signup($username, $password, $getHash = null){
-        $entityManager = $this->getEm();
+class LoginHandler extends BaseController
+{
 
+    public function signup($username, $password, $getHash = null)
+    {
         //Busco que DB estoy actualmente
         $paramValue = $this->getDoctrine()->getConnection()->getHost();
 
         //Seteo el string de la config de la DB
         $db = '(DESCRIPTION=( ADDRESS_LIST= (ADDRESS= (PROTOCOL=TCP)'
-        . ' (HOST='.$paramValue.') (PORT=1521)))'
-        . '( CONNECT_DATA= (SID=NEOSYS) ))';
-        
+            . ' (HOST=' . $paramValue . ') (PORT=1521)))'
+            . '( CONNECT_DATA= (SID=NEOSYS) ))';
+
         try {
             $conn = oci_connect($username, $password, $db, 'UTF8');
-            if($conn == true){
+            if ($conn == true) {
                 $token = array(
-                    'user' => $username,
+                    'username' => $username,
                     'iat' => time(),
-                    //Caduca una vez a la semana
-                    'exp' => time() + (7 * 24 * 60 * 60)
+                    //Caduca cada 12 horas
+                    'exp' => time() + (12 * 60 * 60)
                 );
-    
-                $jwt    = JWT::encode($token, $this->key, "HS256");
-                $data = $jwt;
 
-                // //Si quiero la información decodificada se hace asi
-                // $decoded    = JWT::decode($jwt, $this->key, array("HS256"));
-                // $data       = $decoded;
-            }else{
-                $data = array(
-                    'status' => 'error',
-                    'data' => 'Login failed'
-                );
+                $jwt    = JWT::encode($token, $this->key, "HS256");
+                $data = [
+                    "status" => "success",
+                    "code" => 200,
+                    "token" => $jwt,
+                    "user" => JWT::decode($jwt, $this->key, array("HS256"))
+                ];
             }
-        } catch (\Throwable $th) {
+        } catch (\Exception $e) {
             $data = array(
                 'status' => 'error',
-                'data' => 'Login failed'
+                'message' => 'Login failed',
+                'error' => $e->getMessage()
             );
         }
-        
+
         return $data;
     }
 
-    public function validateAuthorization($data)
-    {           
-        $token      = isset($data['authorization']) ? $data['authorization'] : null;
+    public function validateAuthorization($token)
+    {
+        $token      = isset($token) ? $token : null;
         $authCheck  = $this->validateToken($token);
         if (!$authCheck) {
             throw new \Exception('Invalid Token');
@@ -63,26 +60,27 @@ class LoginHandler extends BaseController {
         return $authCheck;
     }
 
-    public function validateToken($jwt, $getIdentity = false){
+    public function validateToken($jwt, $getIdentity = false)
+    {
         $auth = false;
 
         try {
-            $decoded= JWT::decode($jwt, $this->key, array("HS256"));
+            $decoded = JWT::decode($jwt, $this->key, array("HS256"));
         } catch (\Throwable $th) {
             $auth = false;
         }
 
         //Si existe, es un objeto, es decir se decodifico bien y el ID está definido.
-        if(isset($decoded) && is_object($decoded)){
+        if (isset($decoded) && is_object($decoded)) {
             $auth = true;
-        }else{
+        } else {
             $auth = false;
         }
 
-        if(!$getIdentity){
+        if (!$getIdentity) {
             //Devuelve true o false para validar el token
             return $auth;
-        }else{
+        } else {
             //Devuelve los datos del user logueado
             $data = json_decode(json_encode($decoded), true);
             return $data;
