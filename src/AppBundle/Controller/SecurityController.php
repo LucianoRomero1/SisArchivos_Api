@@ -20,7 +20,7 @@ class SecurityController extends BaseController
 
         $data = array(
             'status' => 'error',
-            'data'  => 'Send json via post!!!'
+            'data'  => 'Se necesita un JSON'
         );
 
         if($json != null){
@@ -37,7 +37,7 @@ class SecurityController extends BaseController
             }else{
                 $data = array(
                     'status' => 'error',
-                    'data'  => 'Invalid credentials'
+                    'data'  => 'Credenciales inválidas'
                 );
             }
         }
