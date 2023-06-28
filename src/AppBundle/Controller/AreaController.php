@@ -19,6 +19,8 @@ class AreaController extends BaseController{
     }
     
     public function createAction(Request $request){
+        //TODO: Enviar el authorization por el HEADER
+        //$request->getHeader(); o algo asi
         try {
             $authorizationHeader = $request->headers->get('Authorization');
             if($this->loginHandler->validateAuthorization($authorizationHeader)){
