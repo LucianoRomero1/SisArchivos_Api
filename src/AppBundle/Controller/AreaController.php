@@ -19,8 +19,6 @@ class AreaController extends BaseController{
     }
     
     public function createAction(Request $request){
-        //TODO: Enviar el authorization por el HEADER
-        //$request->getHeader(); o algo asi
         try {
             $authorizationHeader = $request->headers->get('Authorization');
             if($this->loginHandler->validateAuthorization($authorizationHeader)){
@@ -34,8 +32,7 @@ class AreaController extends BaseController{
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
-
-        // return $this->serializer($this->successResponse($area, 'create'));
+        
         return$this->successResponse($area, 'create');
     }
 
