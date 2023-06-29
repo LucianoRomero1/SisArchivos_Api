@@ -38,9 +38,13 @@ class AreaController extends BaseController
     public function viewAction(PaginatorInterface $paginator, Request $request)
     {
         $data = array();
-        $em = $this->getEm();
-        $areas = $em->getRepository(Area::class)->findAll();
-        $data = $this->paginateData($areas, $paginator, $request);
+        try {
+            $em = $this->getEm();
+            $areas = $em->getRepository(Area::class)->findBy([], ["id" => "DESC"]);
+            $data = $this->paginateData($areas, $paginator, 'areas', $request);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
 
         return $this->successResponse($data);
     }

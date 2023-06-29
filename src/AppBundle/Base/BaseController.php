@@ -69,7 +69,7 @@ class BaseController extends AbstractController {
         return $message;
     }
 
-    public function paginateData($query, $paginator, $request)
+    public function paginateData($query, $paginator, $entity, $request)
     {
         $page               = $request->query->getInt('page', 1);
         $items_per_page     = 10;
@@ -82,7 +82,7 @@ class BaseController extends AbstractController {
             'actual_page'               => $page,
             'items_per_page'            => $items_per_page,
             'total_pages'               => ceil($total_items_count / $items_per_page),
-            'data'                      => $pagination
+            $entity                     => $pagination
         );
 
         return $data;
