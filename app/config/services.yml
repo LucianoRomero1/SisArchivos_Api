@@ -33,8 +33,18 @@ services:
         class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
         tags:
             - { name: doctrine.event_listener, event: postConnect }
+
+    # Este servicio es un listener para que cada endpoint valide el auth, excepto la ruta login por eso el parámetro loginRoute
+    AppBundle\EventListener\AuthorizationListener:
+        arguments:
+            $loginHandler: '@AppBundle\Handlers\LoginHandler' 
+            $loginRoute: 'login'
+
+    kernel.listener.authorization_listener:
+        class: AppBundle\EventListener\AuthorizationListener
+        arguments:
+            - '@AppBundle\Handlers\LoginHandler'  
+            - 'login'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             
-    # add more services, or override services that need manual wiring
-    # AppBundle\Service\ExampleService:
-    #     arguments:
-    #         $someArgument: 'some_value'

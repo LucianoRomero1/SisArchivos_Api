@@ -5,8 +5,6 @@ namespace AppBundle\Handlers;
 use AppBundle\Base\BaseController;
 use Firebase\JWT\JWT;
 
-use AppBundle\Entity\User;
-
 class LoginHandler extends BaseController
 {
 

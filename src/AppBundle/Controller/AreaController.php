@@ -2,78 +2,76 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Base\BaseController;
 use Symfony\Component\HttpFoundation\Request;
+use Knp\Component\Pager\PaginatorInterface;
 
+use AppBundle\Base\BaseController;
+use AppBundle\Entity\Area;
 use AppBundle\Handlers\AreaHandler;
-use AppBundle\Handlers\LoginHandler;
 
-class AreaController extends BaseController{
-
+class AreaController extends BaseController
+{
     private $areaHandler;
-    private $loginHandler;
 
-    public function __construct(AreaHandler $areaHandler, LoginHandler $loginHandler){
-        $this->areaHandler = $areaHandler; 
-        $this->loginHandler = $loginHandler; 
+    public function __construct(AreaHandler $areaHandler)
+    {
+        $this->areaHandler = $areaHandler;
     }
-    
-    public function createAction(Request $request){
+
+    public function createAction(Request $request)
+    {
+        $area = array();
         try {
-            $authorizationHeader = $request->headers->get('Authorization');
-            if($this->loginHandler->validateAuthorization($authorizationHeader)){
-                $data = json_decode($request->getContent(), true);
-                if(empty($data)){
-                    throw new \Exception("Parámetros inválidos");
-                }
-                
-                $area = $this->areaHandler->setArea($data);
-            }  
+            $data = json_decode($request->getContent(), true);
+            if (empty($data)) {
+                throw new \Exception("Parámetros inválidos");
+            }
+
+            $area = $this->areaHandler->setArea($data);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
-        
-        return$this->successResponse($area, 'create');
+
+        return $this->successResponse($area, BaseController::CREATE_ACTION);
     }
 
-    // public function viewAction(PaginatorInterface $paginator, Request $request){
-    //     try {
-    //         $em = $this->getEm();
-    //         $query = $em->getRepository(Area::class)->findAll();
-    //         $data = $this->paginateData($query, $paginator, $request);
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
+    public function viewAction(PaginatorInterface $paginator, Request $request)
+    {
+        $data = array();
+        $em = $this->getEm();
+        $areas = $em->getRepository(Area::class)->findAll();
+        $data = $this->paginateData($areas, $paginator, $request);
 
-    //     return $this->successResponse($data, "success");
-    // }
+        return $this->successResponse($data);
+    }
 
-    // public function editAction(Request $request, $id = null){
-    //     try {
-    //         $em   = $this->getEm();
-    //         $data = $request->request->all();
-    //         $area  = $this->areaHandler->findArea($em, $id);
-    //         $editedArea  = $this->areaHandler->setArea($data, $area);
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
+    public function editAction(Request $request, $id = null)
+    {
+        $editedArea = array();
+        try {
+            $em   = $this->getEm();
+            $data = $request->request->all();
+            $area  = $this->areaHandler->findArea($em, $id);
+            $editedArea  = $this->areaHandler->setArea($data, $area);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
 
-    //     return $this->successResponse($editedArea, 'edit');
-    // }
+        return $this->successResponse($editedArea, BaseController::EDIT_ACTION);
+    }
 
-    // public function deleteAction($id = null){
-    //     try {
-    //         $em = $this->getEm();
-    //         $area = $this->areaHandler->findArea($em, $id);
-    //         $em->remove($area);
-    //         $em->flush();
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
+    public function deleteAction(Request $request, $id = null)
+    {
+        $areaDeleted = array();
+        try {
+            $em = $this->getEm();
+            $areaDeleted = $this->areaHandler->findArea($em, $id);
+            $em->remove($areaDeleted);
+            $em->flush();
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
 
-    //     return $this->successResponse($area, 'delete');
-    // }
+        return $this->successResponse($areaDeleted, BaseController::DELETE_ACTION);
+    }
 }
