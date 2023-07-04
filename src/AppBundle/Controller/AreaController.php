@@ -8,6 +8,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use AppBundle\Base\BaseController;
 use AppBundle\Entity\Area;
 use AppBundle\Handlers\AreaHandler;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AreaController extends BaseController
 {
@@ -37,16 +38,19 @@ class AreaController extends BaseController
 
     public function viewAction(PaginatorInterface $paginator, Request $request)
     {
-        $data = array();
         try {
-            $em = $this->getEm();
-            $areas = $em->getRepository(Area::class)->findBy([], ["id" => "DESC"]);
-            $data = $this->paginateData($areas, $paginator, 'areas', $request);
+            $page = $request->query->getInt('page', 1);
+            $itemsPerPage = $request->query->getInt('perPage', 10);
+            $searchTerm = $request->query->get('search', '');
+
+            $filteredAreas = $this->filterData($searchTerm, Area::class);
+            $pagination = $this->paginateData($paginator, $filteredAreas, $page, $itemsPerPage);
+            $data = $this->buildResponseData($pagination, $page, $itemsPerPage, 'areas');
+
+            return $this->successResponse($data);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
-
-        return $this->successResponse($data);
     }
 
     public function editAction(Request $request, $id = null)

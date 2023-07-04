@@ -2,6 +2,7 @@
 
 namespace AppBundle\Base;
 
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,25 +11,29 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class BaseController extends AbstractController {
+class BaseController extends AbstractController
+{
 
     const CREATE_ACTION = "create";
     const EDIT_ACTION   = "edit";
     const DELETE_ACTION = "delete";
 
     protected $key;
-    private $validator; 
+    private $validator;
 
-    public function __construct(ValidatorInterface $validator){
+    public function __construct(ValidatorInterface $validator)
+    {
         $this->key = 'b4ss022.3b+';
         $this->validator = $validator;
     }
 
-    public function getEm(){
+    public function getEm()
+    {
         return $this->getDoctrine()->getManager();
     }
 
-    public function errorResponse($message = null){
+    public function errorResponse($message = null)
+    {
         $response = new JsonResponse();
         $response->setData([
             "status"    => 'error',
@@ -39,7 +44,8 @@ class BaseController extends AbstractController {
         return $response;
     }
 
-    public function successResponse($data, $action = null){
+    public function successResponse($data, $action = null)
+    {
         $message = $this->messageByAction($action);
         $response = new JsonResponse();
         $response->setData([
@@ -52,7 +58,8 @@ class BaseController extends AbstractController {
         return $response;
     }
 
-    public function messageByAction($action){
+    public function messageByAction($action)
+    {
         $message = '';
         switch ($action) {
             case 'create':
@@ -69,29 +76,44 @@ class BaseController extends AbstractController {
         return $message;
     }
 
-    public function paginateData($query, $paginator, $entity, $request)
+    public function filterData($searchTerm, $entityClass)
     {
-        $page               = $request->query->getInt('page', 1);
-        $items_per_page     = 10;
+        $em = $this->getEm();
+        $repository = $em->getRepository($entityClass);
+        $entities = $repository->findBy([], ['id' => 'DESC']);
 
-        $pagination         = $paginator->paginate($query, $page, $items_per_page);
-        $total_items_count  = $pagination->getTotalItemCount();
+        if (!empty($searchTerm)) {
+            $filteredEntities = array_filter($entities, function ($entity) use ($searchTerm) {
+                return strpos(strtolower($entity->getName()), strtolower($searchTerm)) !== false;
+            });
 
-        $data               = array(
-            'total_items_count'         => $total_items_count,
-            'actual_page'               => $page,
-            'items_per_page'            => $items_per_page,
-            'total_pages'               => ceil($total_items_count / $items_per_page),
-            $entity                     => $pagination
-        );
+            return $filteredEntities;
+        }
 
-        return $data;
+        return $entities;
     }
 
-    public function serializer($data){
+    public function paginateData($paginator, $filteredItems, $page, $itemsPerPage)
+    {
+        return $paginator->paginate($filteredItems, $page, $itemsPerPage);
+    }
+
+    public function buildResponseData($pagination, $page, $itemsPerPage, $entity)
+    {
+        return [
+            'total_items_count' => $pagination->getTotalItemCount(),
+            'actual_page' => $page,
+            'items_per_page' => $itemsPerPage,
+            'total_pages' => ceil($pagination->getTotalItemCount() / $itemsPerPage),
+            $entity => $pagination->getItems()
+        ];
+    }
+
+    public function serializer($data)
+    {
         $normalizers    = array(new GetSetMethodNormalizer());
-        $encoders       = array("json"=> new JsonEncoder());
-        
+        $encoders       = array("json" => new JsonEncoder());
+
         $serializer     = new Serializer($normalizers, $encoders);
         $json           = $serializer->serialize($data, "json");
 
@@ -102,7 +124,8 @@ class BaseController extends AbstractController {
         return $response;
     }
 
-    public function validateErrors($entity){
+    public function validateErrors($entity)
+    {
         // Validar la entidad
         $errors = $this->validator->validate($entity);
 
@@ -114,14 +137,15 @@ class BaseController extends AbstractController {
             }
 
             throw new \Exception(implode(', ', $errorMessages));
-        } 
+        }
 
         return true;
     }
 
-    public function getActualDate(){
-        $fechaActual=  new \DateTime(null, new \DateTimeZone('America/Argentina/Buenos_Aires'));
-                
+    public function getActualDate()
+    {
+        $fechaActual =  new \DateTime(null, new \DateTimeZone('America/Argentina/Buenos_Aires'));
+
         return $fechaActual;
     }
 }
