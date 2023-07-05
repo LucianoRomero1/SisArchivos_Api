@@ -18,11 +18,6 @@ class LoginHandler extends BaseController
             . ' (HOST=' . $paramValue . ') (PORT=1521)))'
             . '( CONNECT_DATA= (SID=NEOSYS) ))';
 
-        // dump($db);
-        // dump($username);
-        // dump($password);
-        // die;
-
         try {
             $conn = oci_connect($username, $password, $db, 'UTF8');
             if ($conn == true) {

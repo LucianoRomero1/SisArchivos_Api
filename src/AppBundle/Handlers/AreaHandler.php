@@ -23,8 +23,8 @@ class AreaHandler extends BaseController
         if(is_null($area)){
             $area = new Area();
         }
-            
-        $area->setName($data["name"]);
+
+        $area->setName(strtoupper($data["name"]));
 
         $this->validateErrors($area);
 

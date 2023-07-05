@@ -70,7 +70,7 @@ class AreaController extends BaseController
         $editedArea = array();
         try {
             $em   = $this->getEm();
-            $data = $request->request->all();
+            $data = json_decode($request->getContent(), true);
             $area  = $this->areaHandler->findArea($em, $id);
             $editedArea  = $this->areaHandler->setArea($data, $area);
         } catch (\Exception $e) {
