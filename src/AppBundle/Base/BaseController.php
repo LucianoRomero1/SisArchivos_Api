@@ -124,6 +124,14 @@ class BaseController extends AbstractController
         return $response;
     }
 
+    public function findById($id, $entity)
+    {
+        $em = $this->getEm();
+        $entityFinded = $em->getRepository($entity)->findOneBy(["id" => $id]);
+
+        return $entityFinded;
+    }
+
     public function validateErrors($entity)
     {
         // Validar la entidad

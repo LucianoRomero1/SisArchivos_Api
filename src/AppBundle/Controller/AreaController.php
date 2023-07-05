@@ -53,6 +53,18 @@ class AreaController extends BaseController
         }
     }
 
+    public function getOneAction($id = null)
+    {
+        $area = $this->findById($id, Area::class);
+
+        if (is_null($area)) {
+            return $this->errorResponse("El área no fue encontrada");
+        }
+
+        return $this->successResponse($area);
+    }
+
+
     public function editAction(Request $request, $id = null)
     {
         $editedArea = array();

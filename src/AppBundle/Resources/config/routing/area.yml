@@ -8,6 +8,11 @@ area_view:
   defaults: { _controller: "AppBundle:Area:view" }
   methods: GET
 
+area_get:
+  path: /get/{id}
+  defaults: { _controller: "AppBundle:Area:getOne", id:null }
+  methods: GET
+
 area_edit:
   path: /edit/{id}
   defaults: { _controller: "AppBundle:Area:edit", id:null }

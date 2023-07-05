@@ -35,7 +35,6 @@ class AuthorizationListener
             // Verificar si la ruta actual es la ruta de inicio de sesión
             if ($currentRoute !== $this->loginRoute) {
                 $authorizationHeader = $request->headers->get('Authorization');
-
                 try {
                     $authCheck = $this->loginHandler->validateAuthorization($authorizationHeader);
                     if (!$authCheck) {
@@ -51,6 +50,7 @@ class AuthorizationListener
                         "code"      => 401,
                         "message"   => $e->getMessage()
                     ]);
+                    
                     $event->setController(function () use ($response) {
                         return $response;
                     });
