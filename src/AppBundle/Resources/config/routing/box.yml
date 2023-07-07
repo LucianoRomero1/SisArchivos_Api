@@ -8,6 +8,11 @@ box_view:
   defaults: { _controller: "AppBundle:Box:view" }
   methods: GET
 
+box_get:
+  path: /get/{id}
+  defaults: { _controller: "AppBundle:Box:getOne", id:null }
+  methods: GET
+
 box_edit:
   path: /edit/{id}
   defaults: { _controller: "AppBundle:Box:edit", id:null }

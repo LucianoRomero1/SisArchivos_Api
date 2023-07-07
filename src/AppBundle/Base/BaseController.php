@@ -127,7 +127,10 @@ class BaseController extends AbstractController
     public function findById($id, $entity)
     {
         $em = $this->getEm();
-        $entityFinded = $em->getRepository($entity)->findOneBy(["id" => $id]);
+        $entityFinded = $em->getRepository($entity)->findOneBy(["id"=>$id]);
+        if(is_null($entityFinded)){
+            throw new \Exception("Registro no encontrado");
+        }
 
         return $entityFinded;
     }

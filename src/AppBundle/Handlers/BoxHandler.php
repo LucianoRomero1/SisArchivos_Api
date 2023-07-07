@@ -9,15 +9,6 @@ use Exception;
 
 class BoxHandler extends BaseController
 {
-    public function findBox($em, $id){
-        $box = $em->getRepository(Box::class)->findOneBy(["id"=>$id]);
-        if(is_null($box)){
-            throw new Exception("Caja no encontrada");
-        }
-
-        return $box;
-    }
-
     public function setBox($data, $box = null){
         $entityManager = $this->getDoctrine()->getManager();
 

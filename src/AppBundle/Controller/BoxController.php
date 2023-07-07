@@ -2,71 +2,94 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
 
+use AppBundle\Base\BaseController;
 use AppBundle\Entity\Box;
 use AppBundle\Handlers\BoxHandler;
 
-class BoxController extends Controller{
-    
+class BoxController extends BaseController
+{
+
     private $boxHandler;
 
-    public function __construct(BoxHandler $boxHandler){
+    public function __construct(BoxHandler $boxHandler)
+    {
         $this->boxHandler = $boxHandler;
     }
 
-    public function createAction(Request $request){
+    public function createAction(Request $request)
+    {
+        $box = array();
         try {
-            $data = $request->request->all();
-            $box  = $this->boxHandler->setBox($data);
+            $data = json_decode($request->getContent(), true);
+            if (empty($data)) {
+                throw new \Exception("Parámetros inválidos");
+            }
+
+            $box = $this->boxHandler->setBox($data);
         } catch (\Exception $e) {
-            $response = $this->errorResponse($e->getMessage());
-            return $response;
+            return $this->errorResponse($e->getMessage());
         }
 
-        return $this->successResponse($box, 'create');
+        return $this->successResponse($box, BaseController::CREATE_ACTION);
     }
 
-    // public function viewAction(PaginatorInterface $paginator, Request $request){
-    //     try {
-    //         $em = $this->getEm();
-    //         $query = $em->getRepository(Box::class)->findAll();
-    //         $data  = $this->paginateData($query, $paginator, $request);
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
+    public function viewAction(PaginatorInterface $paginator, Request $request)
+    {
+        try {
+            $page = $request->query->getInt('page', 1);
+            $itemsPerPage = $request->query->getInt('perPage', 10);
+            $searchTerm = $request->query->get('search', '');
 
-    //     return $this->successResponse($data, "success");
-    // }
+            $filteredBoxes = $this->filterData($searchTerm, Box::class);
+            $pagination = $this->paginateData($paginator, $filteredBoxes, $page, $itemsPerPage);
+            $data = $this->buildResponseData($pagination, $page, $itemsPerPage, 'boxes');
 
-    // public function editAction(Request $request, $id = null){
-    //     try {
-    //         $em    = $this->getEm();
-    //         $data  = $request->request->all();
-    //         $box   = $this->boxHandler->findBox($em, $id);
-    //         $editedBox  = $this->boxHandler->setBox($data, $box);
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
+            return $this->successResponse($data);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
 
-    //     return $this->successResponse($editedBox, 'edit');
-    // }
+    public function getOneAction($id = null)
+    {
+        try {
+            $box = $this->findById($id, Box::class);
+            return $this->successResponse($box);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
 
-    // public function deleteAction($id = null){
-    //     try {
-    //         $em = $this->getEm();
-    //         $box = $this->boxHandler->findBox($em, $id);
-    //         $em->remove($box);
-    //         $em->flush();
-    //     } catch (\Exception $e) {
-    //         $response = $this->errorResponse($e->getMessage());
-    //         return $response;
-    //     }
 
-    //     return $this->successResponse($box, 'delete');
-    // }
+    public function editAction(Request $request, $id = null)
+    {
+        $editedBox = array();
+        try {
+            $box = $this->findById($id, Box::class);
+            $data = json_decode($request->getContent(), true);
+            $editedBox  = $this->boxHandler->setBox($data, $box);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+
+        return $this->successResponse($editedBox, BaseController::EDIT_ACTION);
+    }
+
+    public function deleteAction($id = null)
+    {
+        $box = array();
+        try {
+            $em = $this->getEm();
+            $box = $this->findById($id, Box::class);
+            $em->remove($box);
+            $em->flush();
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+
+        return $this->successResponse($box, BaseController::DELETE_ACTION);
+    }
 }

@@ -55,13 +55,12 @@ class AreaController extends BaseController
 
     public function getOneAction($id = null)
     {
-        $area = $this->findById($id, Area::class);
-
-        if (is_null($area)) {
-            return $this->errorResponse("El área no fue encontrada");
+        try {
+            $area = $this->findById($id, Area::class);
+            return $this->successResponse($area);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
         }
-
-        return $this->successResponse($area);
     }
 
 
@@ -69,9 +68,8 @@ class AreaController extends BaseController
     {
         $editedArea = array();
         try {
-            $em   = $this->getEm();
+            $area = $this->findById($id, Area::class);
             $data = json_decode($request->getContent(), true);
-            $area  = $this->areaHandler->findArea($em, $id);
             $editedArea  = $this->areaHandler->setArea($data, $area);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
@@ -80,18 +78,18 @@ class AreaController extends BaseController
         return $this->successResponse($editedArea, BaseController::EDIT_ACTION);
     }
 
-    public function deleteAction(Request $request, $id = null)
+    public function deleteAction($id = null)
     {
-        $areaDeleted = array();
+        $area = array();
         try {
             $em = $this->getEm();
-            $areaDeleted = $this->areaHandler->findArea($em, $id);
-            $em->remove($areaDeleted);
+            $area = $this->findById($id, Area::class);
+            $em->remove($area);
             $em->flush();
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
 
-        return $this->successResponse($areaDeleted, BaseController::DELETE_ACTION);
+        return $this->successResponse($area, BaseController::DELETE_ACTION);
     }
 }
